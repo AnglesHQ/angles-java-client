@@ -15,7 +15,12 @@ public class AnglesReporterUtils {
     private static String environment;
 
     public static AnglesReporterInterface initialiseAnglesTestParameters() throws AnglesPropertyNotGivenException {
-        String enabled = getAnglesPropertyFromSystem("angles.enabled");
+        String enabled = "false";
+        try {
+            enabled = getAnglesPropertyFromSystem("angles.enabled");
+        } catch (AnglesPropertyNotGivenException exception) {
+            // if angles.enabled is not provided default is false.
+        }
         if (enabled.equals("true")) {
             anglesReporter = AnglesReporter.getInstance(getAnglesPropertyFromSystem("angles.url") + "/rest/api/v1.0/");
             runName = getAnglesPropertyFromSystem("angles.runName");
