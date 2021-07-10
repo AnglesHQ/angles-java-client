@@ -4,23 +4,23 @@
         <artifactId>angles-java-client</artifactId>
         <groupId>com.github.angleshq</groupId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.0.11-SNAPSHOT</version>
+        <version>1.0.12</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>angles-cucumberjvm</artifactId>
-    <version>1.0.11-SNAPSHOT</version>
+    <version>1.0.12</version>
 
     <dependencies>
         <dependency>
             <groupId>com.github.angleshq</groupId>
             <artifactId>angles-java-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.12</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.angleshq</groupId>
             <artifactId>angles-junit5</artifactId>
-            <version>1.0.11-SNAPSHOT</version>
+            <version>1.0.12</version>
             <scope>compile</scope>
         </dependency>
 
