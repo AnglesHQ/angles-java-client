@@ -8,7 +8,7 @@ Add the following dependency to your Maven POM:
 <dependency>
   <groupId>com.github.angleshq</groupId>
   <artifactId>angles-java-core</artifactId>
-  <version>1.0.24</version>
+  <version>1.0.25</version>
 </dependency>
 ```
 
