@@ -19,13 +19,6 @@
             <version>1.0.25-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.angleshq</groupId>
-            <artifactId>angles-junit5</artifactId>
-            <version>1.0.25-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- Cucumber bdd and spring tests -->
         <dependency>
             <groupId>io.cucumber</groupId>

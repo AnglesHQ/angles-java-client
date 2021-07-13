@@ -1,6 +1,6 @@
 package com.github.angleshq.angles.listeners.cucumber;
 
-import com.github.angleshq.angles.assertion.junit.AnglesJUnit5Assert;
+import com.github.angleshq.angles.assertion.cucumber.AnglesJUnitAssert;
 import com.github.angleshq.angles.basetest.AbstractAnglesTestCase;
 import cucumber.api.Result;
 import cucumber.api.TestStep;
@@ -13,7 +13,7 @@ import gherkin.pickles.PickleTable;
 
 public class AnglesCucumber2Adapter extends AbstractAnglesTestCase implements Formatter {
     //initialize the assertion instance
-    protected AnglesJUnit5Assert doAssert = new AnglesJUnit5Assert();
+    protected AnglesJUnitAssert doAssert = new AnglesJUnitAssert();
 
     //event handlers - Angles loggers
     protected EventHandler<TestStepStarted> handleTestStepFinished = new EventHandler<TestStepStarted>() {
