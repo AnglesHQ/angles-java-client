@@ -7,7 +7,7 @@ Simply add the following dependency to your POM:
 <dependency>
   <groupId>com.github.angleshq</groupId>
   <artifactId>angles-cucumberjvm</artifactId>
-  <version>1.0.25</version>
+  <version>1.0.26</version>
 </dependency>
 ```
 
