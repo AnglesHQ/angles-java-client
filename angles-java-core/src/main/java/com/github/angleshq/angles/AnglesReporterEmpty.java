@@ -103,4 +103,9 @@ public class AnglesReporterEmpty implements AnglesReporterInterface {
         // do nothing
         return null;
     }
+
+    public String getBuildId() {
+        // do nothing
+        return null;
+    }
 }

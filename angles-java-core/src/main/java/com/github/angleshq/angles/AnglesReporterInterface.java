@@ -48,6 +48,8 @@ public interface AnglesReporterInterface {
 
     void fail(String name, String expected, String actual, String info, String screenshotId);
 
+    String getBuildId();
+
     Screenshot storeScreenshot(ScreenshotDetails details);
 
     ImageCompareResponse compareScreenshotAgainstBaseline(String screenshotId);
