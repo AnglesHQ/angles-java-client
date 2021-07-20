@@ -240,6 +240,13 @@ public class AnglesReporter implements AnglesReporterInterface {
         return null;
     }
 
+    public String getBuildId() {
+        if (this.currentBuild.get() != null) {
+            return this.currentBuild.get().getId();
+        }
+        return null;
+    }
+
     /**
      * This method allows you to disable angles (in case you wanted to have a local run).
      *
