@@ -129,7 +129,9 @@ public class AnglesReporter implements AnglesReporterInterface {
     }
 
     public void storePlatformDetails(Platform... platform) {
-        currentExecution.get().addPlatform(platform);
+        if (currentExecution.get() != null) {
+            currentExecution.get().addPlatform(platform);
+        }
     }
 
     public void startAction(String description) {
