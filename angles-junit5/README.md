@@ -9,7 +9,7 @@ Simply add the following dependency to your POM:
 <dependency>
   <groupId>com.github.angleshq</groupId>
   <artifactId>angles-junit5</artifactId>
-  <version>1.0.26</version>
+  <version>1.0.27</version>
 </dependency>
 ```
 
