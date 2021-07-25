@@ -11,6 +11,7 @@
         <module>angles-testng</module>
         <module>angles-junit5</module>
         <module>angles-cucumberjvm</module>
+        <module>angles-cucumberjvm-legacy</module>
     </modules>
 
     <name>Angles Java client</name>
