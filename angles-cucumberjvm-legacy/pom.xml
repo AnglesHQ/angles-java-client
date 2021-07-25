@@ -7,10 +7,10 @@
         <version>1.0.28-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>angles-cucumberjvm</artifactId>
+    <artifactId>angles-cucumberjvm-legacy</artifactId>
     <version>1.0.28-SNAPSHOT</version>
     <properties>
-        <cucumber.core.version>6.10.4</cucumber.core.version>
+        <cucumber.core.version>2.3.1</cucumber.core.version>
     </properties>
     <dependencies>
         <dependency>
