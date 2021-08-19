@@ -22,6 +22,8 @@ Please ensure you set the following system variables (e.g. as part of the maven-
     <angles.team>SampleTeamName</angles.team>
     <angles.component>SampleComponent</angles.component>
     <angles.environment>SampleEnvironmentName</angles.environment>
+    <!-- optional -->
+    <angles.phase></angles.phase>
 </systemPropertyVariables>
 ```
 

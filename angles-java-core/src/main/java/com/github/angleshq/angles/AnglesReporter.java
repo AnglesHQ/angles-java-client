@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 public class AnglesReporter implements AnglesReporterInterface {
 
     public static final String DEFAULT_ACTION_NAME = "Test Details";
@@ -63,7 +65,12 @@ public class AnglesReporter implements AnglesReporterInterface {
         screenshotRequests = new ScreenshotRequests(baseUrl);
     }
 
+
     public synchronized void startBuild(String name, String environmentName, String teamName, String componentName) {
+        startBuild(name, environmentName, teamName, componentName, null);
+    }
+
+    public synchronized void startBuild(String name, String environmentName, String teamName, String componentName, String phase) {
         if (currentBuild.get() != null) {
             return;
         }
@@ -73,6 +80,9 @@ public class AnglesReporter implements AnglesReporterInterface {
         createBuild.setTeam(teamName);
         createBuild.setComponent(componentName);
         createBuild.setStart(new Date());
+        if (!isBlank(phase))
+            createBuild.setPhase(phase);
+
         try {
             currentBuild.set(buildRequests.create(createBuild));
         } catch (IOException | AnglesServerException exception) {

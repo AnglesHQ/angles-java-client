@@ -18,6 +18,7 @@ public class Build extends BaseModel {
     private Team team;
     private String name;
     private String component;
+    private String phase;
     private Map<String, Integer> result;
     private List<Artifact> artifacts = new ArrayList<>();
     private List<Suite> suites = new ArrayList<>();

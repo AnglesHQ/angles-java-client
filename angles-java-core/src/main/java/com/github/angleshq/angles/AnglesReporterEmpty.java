@@ -18,6 +18,10 @@ public class AnglesReporterEmpty implements AnglesReporterInterface {
         // do nothing
     }
 
+    public void startBuild(String name, String environmentName, String teamName, String componentName, String phaseName) {
+        // do nothing
+    }
+
     public void storeArtifacts(Artifact[] artifacts) {
         // do nothing
     }

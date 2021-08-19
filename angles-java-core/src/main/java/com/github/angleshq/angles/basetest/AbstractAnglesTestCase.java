@@ -12,7 +12,7 @@ public abstract class AbstractAnglesTestCase {
     protected AbstractAnglesTestCase() {
         try {
             anglesReporter = initialiseAnglesTestParameters();
-            anglesReporter.startBuild(getRunName(), getEnvironment(), getTeam(), getComponent());
+            anglesReporter.startBuild(getRunName(), getEnvironment(), getTeam(), getComponent(), getPhase());
         } catch (AnglesPropertyNotGivenException e) {
             System.out.println("Please ensure you provide all required system properties for Angles Dashboard.");
         }
