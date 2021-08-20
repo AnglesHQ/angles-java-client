@@ -13,6 +13,7 @@ public class AnglesReporterUtils {
     private static String team;
     private static String component;
     private static String environment;
+    private static String phase;
 
     public static AnglesReporterInterface initialiseAnglesTestParameters() throws AnglesPropertyNotGivenException {
         String enabled = "false";
@@ -27,6 +28,7 @@ public class AnglesReporterUtils {
             team = getAnglesPropertyFromSystem("angles.team");
             component = getAnglesPropertyFromSystem("angles.component");
             environment = getAnglesPropertyFromSystem("angles.environment");
+            phase = getAnglesPropertyFromSystem("angles.phase", false);
         } else {
             // angles has been disabled.
             AnglesReporter.setEnabled(false);
@@ -36,8 +38,12 @@ public class AnglesReporterUtils {
     }
 
     public static String getAnglesPropertyFromSystem(String property) throws AnglesPropertyNotGivenException {
+        return getAnglesPropertyFromSystem(property, true);
+    }
+
+    public static String getAnglesPropertyFromSystem(String property, Boolean mandatory) throws AnglesPropertyNotGivenException {
         String propertyValue = System.getProperty(property);
-        if(isBlank(propertyValue)) {
+        if(isBlank(propertyValue) && mandatory) {
             throw new AnglesPropertyNotGivenException("Detected that property [" + property + "] was not given. Please add this mandatory property as a system property");
         }
         return propertyValue;
@@ -61,5 +67,9 @@ public class AnglesReporterUtils {
 
     public static String getEnvironment() {
         return environment;
+    }
+
+    public static String getPhase() {
+        return phase;
     }
 }

@@ -12,6 +12,7 @@ public class CreateBuild implements Serializable {
     private String team;
     private String environment;
     private String name;
+    private String phase;
     private Date start;
     private String component;
 }

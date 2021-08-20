@@ -12,6 +12,8 @@ public interface AnglesReporterInterface {
 
     void startBuild(String name, String environmentName, String teamName, String componentName);
 
+    void startBuild(String name, String environmentName, String teamName, String componentName, String phaseName);
+
     void storeArtifacts(Artifact[] artifacts);
 
     void startTest(String suiteName, String testName);
