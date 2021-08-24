@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter @Setter @NoArgsConstructor
 public class CreateExecution implements Serializable {
@@ -20,7 +21,8 @@ public class CreateExecution implements Serializable {
     private String feature;
     private List<String> tags = new ArrayList<>();
     private Date start;
-    private List<Action> actions = new ArrayList<>();
+    /* prevent any modifications by other threads to cause an issue. */
+    private List<Action> actions = new CopyOnWriteArrayList<>();
     private List<Platform> platforms = new ArrayList<>();
 
     public void addTag(String tag) {
