@@ -8,7 +8,7 @@ Simply add the following dependency to your POM:
 <dependency>
   <groupId>com.github.angleshq</groupId>
   <artifactId>angles-testng</artifactId>
-  <version>1.0.29</version>
+  <version>1.0.31</version>
 </dependency>
 ```
 
