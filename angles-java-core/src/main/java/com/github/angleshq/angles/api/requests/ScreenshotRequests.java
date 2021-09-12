@@ -38,7 +38,6 @@ public class ScreenshotRequests extends BaseRequests {
         String mimeType = tika.detect(screenShotFile);
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder
             .create()
-            .addBinaryBody("screenshot", screenShotFile, ContentType.getByMimeType(mimeType), screenShotFile.getName())
             .addTextBody("buildId", createScreenshot.getBuildId())
             .addTextBody("timestamp", sdf.format(createScreenshot.getTimestamp()))
             .setContentType(ContentType.MULTIPART_FORM_DATA);
@@ -60,6 +59,7 @@ public class ScreenshotRequests extends BaseRequests {
             }
             entityBuilder.addTextBody("tags", jsonArray.toString());
         }
+        entityBuilder.addBinaryBody("screenshot", screenShotFile, ContentType.getByMimeType(mimeType), screenShotFile.getName());
         HttpEntity entity = entityBuilder.build();
         CloseableHttpResponse response = sendMultiPartEntity(basePath, new HashMap<>(), entity);
         return processResponse(response, Screenshot.class);
