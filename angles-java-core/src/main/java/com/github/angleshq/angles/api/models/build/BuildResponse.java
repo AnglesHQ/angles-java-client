@@ -16,6 +16,7 @@ public class BuildResponse extends BaseModel {
     private String team;
     private String name;
     private String component;
+    private String phase;
     private Map<String, Integer> result;
     private List<Artifact> artifacts = new ArrayList<>();
     private List<SuiteResponse> suites = new ArrayList<>();
