@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Setter @Getter @NoArgsConstructor
-public class Step {
+public class Step implements Serializable {
 
     private String name;
     private String expected;

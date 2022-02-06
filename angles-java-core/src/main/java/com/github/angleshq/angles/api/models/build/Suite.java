@@ -1,5 +1,6 @@
 package com.github.angleshq.angles.api.models.build;
 
+import com.github.angleshq.angles.api.models.execution.CreateExecution;
 import com.github.angleshq.angles.api.models.execution.Execution;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +12,11 @@ import java.util.List;
 @Getter @Setter @NoArgsConstructor
 public class Suite {
     private String name;
-    private List<Execution> executions = new ArrayList<>();
+    private CreateExecution setup;
+    private CreateExecution teardown;
+    private List<CreateExecution> executions = new ArrayList<>();
 
-    public void addExecution(Execution execution) {
+    public void addExecution(CreateExecution execution) {
         this.executions.add(execution);
     }
 }

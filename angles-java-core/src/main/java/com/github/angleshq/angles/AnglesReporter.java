@@ -5,6 +5,7 @@ import com.github.angleshq.angles.api.models.Platform;
 import com.github.angleshq.angles.api.models.build.Artifact;
 import com.github.angleshq.angles.api.models.build.Build;
 import com.github.angleshq.angles.api.models.build.CreateBuild;
+import com.github.angleshq.angles.api.models.build.Suite;
 import com.github.angleshq.angles.api.models.execution.Action;
 import com.github.angleshq.angles.api.models.execution.CreateExecution;
 import com.github.angleshq.angles.api.models.execution.Step;
@@ -15,10 +16,7 @@ import com.github.angleshq.angles.api.models.screenshot.ScreenshotDetails;
 import com.github.angleshq.angles.api.requests.*;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -26,19 +24,20 @@ public class AnglesReporter implements AnglesReporterInterface {
 
     public static final String DEFAULT_ACTION_NAME = "Test Details";
     public static final String EMPTY_REPORTER_NAME = "empty";
+
     private static Map<String, AnglesReporterInterface> reporterMap = new HashMap<>();
     private static boolean enabled = true;
-    private String baseUrl;
-    private BuildRequests buildRequests;
+    private static boolean delayedReporting = true;
+
+    protected String baseUrl;
+    protected BuildRequests buildRequests;
     private ExecutionRequests executionRequests;
-    private EnvironmentRequests environmentRequests;
-    private TeamRequests teamRequests;
     private ScreenshotRequests screenshotRequests;
 
-    private InheritableThreadLocal<Build> currentBuild = new InheritableThreadLocal<>();
-    private InheritableThreadLocal<CreateExecution> currentExecution = new InheritableThreadLocal<>();
-    private InheritableThreadLocal<Action> currentAction = new InheritableThreadLocal<>();
-    private ThreadLocal<Action> setUpAction = new InheritableThreadLocal<>();
+    protected InheritableThreadLocal<Build> currentBuild = new InheritableThreadLocal<>();
+    protected InheritableThreadLocal<CreateExecution> currentExecution = new InheritableThreadLocal<>();
+    protected InheritableThreadLocal<Action> currentAction = new InheritableThreadLocal<>();
+    protected InheritableThreadLocal<Suite> currentSuite = new InheritableThreadLocal<>();
 
     public static AnglesReporterInterface getInstance(String url) {
         // if angles is disabled, return the empty reporter
@@ -51,29 +50,23 @@ public class AnglesReporter implements AnglesReporterInterface {
 
         // if not disabled then return the reporter.
         if (!AnglesReporter.reporterMap.containsKey(url)) {
-            AnglesReporter.reporterMap.put(url, new AnglesReporter(url));
+            if (delayedReporting) {
+                AnglesReporter.reporterMap.put(url, new AnglesDelayedReporter(url));
+            } else {
+                AnglesReporter.reporterMap.put(url, new AnglesReporter(url));
+            }
         }
         return AnglesReporter.reporterMap.get(url);
     }
 
-    private AnglesReporter(String url) {
+    protected AnglesReporter(String url) {
         this.baseUrl = url;
         buildRequests = new BuildRequests(baseUrl);
         executionRequests = new ExecutionRequests(baseUrl);
-        environmentRequests = new EnvironmentRequests(baseUrl);
-        teamRequests = new TeamRequests(baseUrl);
         screenshotRequests = new ScreenshotRequests(baseUrl);
     }
 
-
-    public synchronized void startBuild(String name, String environmentName, String teamName, String componentName) {
-        startBuild(name, environmentName, teamName, componentName, null);
-    }
-
-    public synchronized void startBuild(String name, String environmentName, String teamName, String componentName, String phase) {
-        if (currentBuild.get() != null) {
-            return;
-        }
+    protected CreateBuild createBuild(String name, String environmentName, String teamName, String componentName, String phase) {
         CreateBuild createBuild = new CreateBuild();
         createBuild.setName(name);
         createBuild.setEnvironment(environmentName);
@@ -82,7 +75,43 @@ public class AnglesReporter implements AnglesReporterInterface {
         createBuild.setStart(new Date());
         if (!isBlank(phase))
             createBuild.setPhase(phase);
+        return createBuild;
+    }
 
+    protected CreateExecution createExecution(String suiteName, String testName, String feature, List<String> tags) {
+        CreateExecution createExecution = new CreateExecution();
+        createExecution.setStart(new Date());
+        if (currentBuild.get() != null)
+            createExecution.setBuild(currentBuild.get().getId());
+        createExecution.setTitle(testName);
+        createExecution.setSuite(suiteName);
+        createExecution.setFeature(feature);
+        createExecution.setTags(tags);
+        return createExecution;
+    }
+
+    protected Suite createSuite(String suiteName) {
+        Suite suite = new Suite();
+        suite.setName(suiteName);
+        CreateExecution setupExecution = createExecution("Suite Setup", suiteName, null, null);
+        this.currentExecution.set(setupExecution);
+        suite.setSetup(setupExecution);
+        return suite;
+    }
+
+    public synchronized void startBuild(String name, String environmentName, String teamName, String componentName) {
+        startBuild(name, environmentName, teamName, componentName, null);
+    }
+
+    public void saveBuild() {
+        // do nothing;
+    }
+
+    public synchronized void startBuild(String name, String environmentName, String teamName, String componentName, String phase) {
+        if (currentBuild.get() != null) {
+            return;
+        }
+        CreateBuild createBuild = createBuild(name, environmentName, teamName, componentName, phase);
         try {
             currentBuild.set(buildRequests.create(createBuild));
         } catch (IOException | AnglesServerException exception) {
@@ -91,11 +120,17 @@ public class AnglesReporter implements AnglesReporterInterface {
     }
 
     public synchronized void storeArtifacts(Artifact[] artifacts) {
-        try {
-            currentBuild.set(buildRequests.artifacts(currentBuild.get().getId(), artifacts));
-        } catch (IOException | AnglesServerException exception) {
-            throw new Error("Unable to store build artifacts due to [" + exception.getMessage() + "]");
+        if (currentBuild.get().getArtifacts().size() == 0) {
+            try {
+                currentBuild.set(buildRequests.artifacts(currentBuild.get().getId(), artifacts));
+            } catch (IOException | AnglesServerException exception) {
+                throw new Error("Unable to store build artifacts due to [" + exception.getMessage() + "]");
+            }
         }
+    }
+
+    public void startSuite(String suiteName) {
+        this.currentSuite.set(createSuite(suiteName));
     }
 
     public void startTest(String suiteName, String testName) {
@@ -110,20 +145,11 @@ public class AnglesReporter implements AnglesReporterInterface {
         startTest(suiteName, testName, feature, null);
     }
 
-    public void startTest(String suiteName, String testName, String feature, List<String> tags) {
-        CreateExecution createExecution = new CreateExecution();
-        createExecution.setStart(new Date());
-        createExecution.setBuild(currentBuild.get().getId());
-        createExecution.setTitle(testName);
-        createExecution.setSuite(suiteName);
-        createExecution.setFeature(feature);
-        createExecution.setTags(tags);
-        currentExecution.set(createExecution);
-        if (setUpAction.get() != null) {
-            // TODO: handle suite setup
-            // currentExecution.get().addAction(setUpAction.get());
-            setUpAction.set(null);
+    public synchronized void startTest(String suiteName, String testName, String feature, List<String> tags) {
+        if (this.currentSuite.get() == null) {
+            startSuite(suiteName);
         }
+        currentExecution.set(createExecution(suiteName, testName, feature, tags));
         currentAction.set(null);
     }
 
@@ -146,7 +172,13 @@ public class AnglesReporter implements AnglesReporterInterface {
 
     public void startAction(String description) {
         this.currentAction.set(new Action(description));
-        this.currentExecution.get().getActions().add(this.currentAction.get());
+        if (currentExecution.get() == null) {
+            if (this.currentSuite.get() != null) {
+                this.currentSuite.get().getSetup().addAction(this.currentAction.get());
+            }
+        } else {
+            this.currentExecution.get().getActions().add(this.currentAction.get());
+        }
     }
 
     public void debug(String debug) {
@@ -193,7 +225,7 @@ public class AnglesReporter implements AnglesReporterInterface {
         addStep(name, expected, actual, info, status, null);
     }
 
-    private void addStep(String name, String expected, String actual, String info, StepStatus status, String screenshotId) {
+    protected void addStep(String name, String expected, String actual, String info, StepStatus status, String screenshotId) {
         Step step = new Step();
         step.setTimestamp(new Date());
         step.setStatus(status);
@@ -204,20 +236,12 @@ public class AnglesReporter implements AnglesReporterInterface {
         if (screenshotId !=null) {
             step.setScreenshot(screenshotId);
         }
-        // scenarios, 1. pre logs, 2. no action
-        if (currentExecution.get() == null) {
-            // test hasn't started yet (or maybe it has finished).
-            if (setUpAction.get() == null) {
-                this.setUpAction.set(new Action("Test-Setup"));
-            }
-            setUpAction.get().addStep(step);
-        } else {
-            // test has started
-            if (currentAction.get() == null) {
-                startAction(DEFAULT_ACTION_NAME);
-            }
-            currentAction.get().addStep(step);
+
+        // test has started
+        if (currentAction.get() == null) {
+            startAction(DEFAULT_ACTION_NAME);
         }
+        currentAction.get().addStep(step);
     }
 
     public Screenshot storeScreenshot(ScreenshotDetails details) {
@@ -270,6 +294,21 @@ public class AnglesReporter implements AnglesReporterInterface {
 
     public static boolean isEnabled() {
         return AnglesReporter.enabled;
+    }
+
+    /**
+     * By setting this variable the Angles client will only send a single request to store the build (when saveBuild
+     * is called). This is useful for e.g. Unit tests who don't want to be delayed by the additional before/after tests
+     * calls to Angles.
+     *
+     * @param delayedReporting
+     */
+    public static void setDelayedReporting(boolean delayedReporting) {
+        AnglesReporter.delayedReporting = delayedReporting;
+    }
+
+    public static boolean isDelayedReporting() {
+        return delayedReporting;
     }
 
 }

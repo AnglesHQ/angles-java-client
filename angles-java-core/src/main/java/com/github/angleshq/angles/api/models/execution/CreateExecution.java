@@ -25,6 +25,13 @@ public class CreateExecution implements Serializable {
     private List<Action> actions = new CopyOnWriteArrayList<>();
     private List<Platform> platforms = new ArrayList<>();
 
+    public CreateExecution(String build, String title, String suite, Date start) {
+        this.build = build;
+        this.title = title;
+        this.suite = suite;
+        this.start = start;
+    }
+
     public void addTag(String tag) {
         this.tags.add(tag);
     }

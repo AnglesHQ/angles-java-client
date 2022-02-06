@@ -4,8 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Setter @Getter @NoArgsConstructor
-public class Platform {
+public class Platform implements Serializable {
 
     private String platformName;
     private String platformVersion;

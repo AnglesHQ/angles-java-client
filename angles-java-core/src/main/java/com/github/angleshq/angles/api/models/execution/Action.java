@@ -3,11 +3,12 @@ package com.github.angleshq.angles.api.models.execution;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
-public class Action {
+public class Action implements Serializable {
 
     private String name;
     private List<Step> steps = new ArrayList<Step>();
