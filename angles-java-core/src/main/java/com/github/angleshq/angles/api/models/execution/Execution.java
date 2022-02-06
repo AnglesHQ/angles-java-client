@@ -21,7 +21,14 @@ public class Execution extends BaseModel {
     private List<Action> actions = new ArrayList<>();
     private List<Platform> platforms = new ArrayList<>();
 
-    public Execution(String build, String title, String suite, String feature,Date start) {
+    public Execution(String build, String title, String suite, Date start) {
+        this.build = build;
+        this.title = title;
+        this.suite = suite;
+        this.start = start;
+    }
+
+    public Execution(String build, String title, String suite, String feature, Date start) {
         this.build = build;
         this.title = title;
         this.suite = suite;

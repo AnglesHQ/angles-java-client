@@ -22,7 +22,17 @@ public class AnglesReporterEmpty implements AnglesReporterInterface {
         // do nothing
     }
 
+    @Override
+    public void saveBuild() {
+        // do nothing
+    }
+
     public void storeArtifacts(Artifact[] artifacts) {
+        // do nothing
+    }
+
+    @Override
+    public void startSuite(String suiteName) {
         // do nothing
     }
 
