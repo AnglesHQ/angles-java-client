@@ -88,10 +88,10 @@ public abstract class BaseRequests {
             String bodyString =  EntityUtils.toString(response.getEntity());
             JsonObject jsonResponse = gson.fromJson(bodyString, JsonObject.class);
             errorMessage = jsonResponse.get("message").toString();
-        } catch (IOException exc) {
+        } catch (IOException | JsonSyntaxException exc) {
             try {
                 errorMessage =  EntityUtils.toString(response.getEntity());
-            } catch (IOException exception) {
+            } catch (Exception exception) {
                 errorMessage = "Unable to extract error message from response due to [" + exception.getMessage() + "]";
             }
         }
