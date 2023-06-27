@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -20,7 +21,19 @@ import java.util.Map;
 
 public abstract class BaseRequests {
 
-    protected CloseableHttpClient client = HttpClients.createDefault();
+    protected int connectionTimeout = 5000;
+    protected int socketTimeout = 10000;
+
+    // Create RequestConfig with desired timeout values
+    protected RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(connectionTimeout)
+            .setSocketTimeout(socketTimeout)
+            .build();
+
+    protected CloseableHttpClient client = HttpClients.custom()
+            .setDefaultRequestConfig(requestConfig)
+            .build();
+
     protected String baseUrl;
     protected Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
