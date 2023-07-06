@@ -21,24 +21,21 @@ import java.util.Map;
 
 public abstract class BaseRequests {
 
-    protected int connectionTimeout = 5000;
-    protected int socketTimeout = 10000;
-
-    // Create RequestConfig with desired timeout values
-    protected RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectTimeout(connectionTimeout)
-            .setSocketTimeout(socketTimeout)
-            .build();
-
-    protected CloseableHttpClient client = HttpClients.custom()
-            .setDefaultRequestConfig(requestConfig)
-            .build();
+    protected CloseableHttpClient client;
 
     protected String baseUrl;
     protected Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
     protected BaseRequests(String baseUrl) {
         this.baseUrl = baseUrl;
+        this.client = HttpClients.createDefault();
+    }
+
+    protected BaseRequests(String baseUrl, RequestConfig requestConfig) {
+        this.baseUrl = baseUrl;
+        this.client = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
     }
 
     protected CloseableHttpResponse sendJSONPost(String path, Object message) throws IOException {
