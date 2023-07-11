@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -20,12 +21,21 @@ import java.util.Map;
 
 public abstract class BaseRequests {
 
-    protected CloseableHttpClient client = HttpClients.createDefault();
+    protected CloseableHttpClient client;
+
     protected String baseUrl;
     protected Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
     protected BaseRequests(String baseUrl) {
         this.baseUrl = baseUrl;
+        this.client = HttpClients.createDefault();
+    }
+
+    protected BaseRequests(String baseUrl, RequestConfig requestConfig) {
+        this.baseUrl = baseUrl;
+        this.client = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
     }
 
     protected CloseableHttpResponse sendJSONPost(String path, Object message) throws IOException {

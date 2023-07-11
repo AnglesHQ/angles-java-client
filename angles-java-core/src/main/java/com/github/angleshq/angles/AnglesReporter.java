@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.http.client.config.RequestConfig;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -35,12 +36,19 @@ public class AnglesReporter implements AnglesReporterInterface {
     private TeamRequests teamRequests;
     private ScreenshotRequests screenshotRequests;
 
+    protected static int connectionTimeout = 5000;
+    protected static int socketTimeout = 10000;
+
     private InheritableThreadLocal<Build> currentBuild = new InheritableThreadLocal<>();
     private InheritableThreadLocal<CreateExecution> currentExecution = new InheritableThreadLocal<>();
     private InheritableThreadLocal<Action> currentAction = new InheritableThreadLocal<>();
     private ThreadLocal<Action> setUpAction = new InheritableThreadLocal<>();
 
     public static AnglesReporterInterface getInstance(String url) {
+       return getInstance(url, null);
+    }
+
+    public static AnglesReporterInterface getInstance(String url, RequestConfig requestConfig) {
         // if angles is disabled, return the empty reporter
         if (!enabled) {
             if (!AnglesReporter.reporterMap.containsKey(EMPTY_REPORTER_NAME)) {
@@ -51,20 +59,22 @@ public class AnglesReporter implements AnglesReporterInterface {
 
         // if not disabled then return the reporter.
         if (!AnglesReporter.reporterMap.containsKey(url)) {
-            AnglesReporter.reporterMap.put(url, new AnglesReporter(url));
+            AnglesReporter.reporterMap.put(url, new AnglesReporter(url, requestConfig));
         }
         return AnglesReporter.reporterMap.get(url);
     }
 
-    private AnglesReporter(String url) {
+    private AnglesReporter(String url, RequestConfig requestConfig) {
+        if(requestConfig == null) {
+            requestConfig = getDefaultRequestConfig();
+        }
         this.baseUrl = url;
         buildRequests = new BuildRequests(baseUrl);
-        executionRequests = new ExecutionRequests(baseUrl);
+        executionRequests = new ExecutionRequests(baseUrl, requestConfig);
         environmentRequests = new EnvironmentRequests(baseUrl);
         teamRequests = new TeamRequests(baseUrl);
         screenshotRequests = new ScreenshotRequests(baseUrl);
     }
-
 
     public synchronized void startBuild(String name, String environmentName, String teamName, String componentName) {
         startBuild(name, environmentName, teamName, componentName, null);
@@ -270,6 +280,13 @@ public class AnglesReporter implements AnglesReporterInterface {
 
     public static boolean isEnabled() {
         return AnglesReporter.enabled;
+    }
+
+    private RequestConfig getDefaultRequestConfig() {
+        return RequestConfig.custom()
+                .setConnectTimeout(connectionTimeout)
+                .setSocketTimeout(socketTimeout)
+                .build();
     }
 
 }

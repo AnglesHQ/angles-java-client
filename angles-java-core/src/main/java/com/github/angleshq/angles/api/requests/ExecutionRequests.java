@@ -6,6 +6,7 @@ import com.github.angleshq.angles.api.models.execution.AddPlatforms;
 import com.github.angleshq.angles.api.models.execution.CreateExecution;
 import com.github.angleshq.angles.api.models.execution.Execution;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.io.IOException;
@@ -15,6 +16,10 @@ public class ExecutionRequests extends BaseRequests {
     private String basePath = "execution";
     public ExecutionRequests(String baseUrl) {
         super(baseUrl);
+    }
+
+    public ExecutionRequests(String baseUrl, RequestConfig requestConfig) {
+        super(baseUrl, requestConfig);
     }
 
     public Execution create(CreateExecution createExecution) throws IOException, AnglesServerException {
