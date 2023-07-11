@@ -38,7 +38,6 @@ public class AnglesReporter implements AnglesReporterInterface {
 
     protected static int connectionTimeout = 5000;
     protected static int socketTimeout = 10000;
-    private static RequestConfig.Builder requestConfig = RequestConfig.custom();
 
     private InheritableThreadLocal<Build> currentBuild = new InheritableThreadLocal<>();
     private InheritableThreadLocal<CreateExecution> currentExecution = new InheritableThreadLocal<>();
