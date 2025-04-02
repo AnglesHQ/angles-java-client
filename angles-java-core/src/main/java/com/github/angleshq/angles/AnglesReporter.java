@@ -13,13 +13,13 @@ import com.github.angleshq.angles.api.models.screenshot.ImageCompareResponse;
 import com.github.angleshq.angles.api.models.screenshot.Screenshot;
 import com.github.angleshq.angles.api.models.screenshot.ScreenshotDetails;
 import com.github.angleshq.angles.api.requests.*;
+import org.apache.http.client.config.RequestConfig;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.http.client.config.RequestConfig;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -267,6 +267,17 @@ public class AnglesReporter implements AnglesReporterInterface {
             return this.currentBuild.get().getId();
         }
         return null;
+    }
+
+    public void setBuildToKeep() {
+        if (currentBuild.get() == null || buildRequests == null) {
+            return;
+        }
+        try {
+            buildRequests.keep(getBuildId(), true);
+        } catch(AnglesServerException | IOException exception) {
+            throw new Error("Unable set the build to keep due to [" + exception.getMessage() + "]");
+        }
     }
 
     /**
