@@ -5,7 +5,7 @@
     <groupId>com.github.angleshq</groupId>
     <artifactId>angles-java-client</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.41-SNAPSHOT</version>
+    <version>1.0.42-SNAPSHOT</version>
     <modules>
         <module>angles-java-core</module>
         <module>angles-testng</module>
@@ -112,6 +112,15 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>ossrh</publishingServerId>
+                </configuration>
             </plugin>
         </plugins>
     </build>
