@@ -15,19 +15,16 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           server-id: ossrh
-          server-username: MAVEN_USERNAME # env variable for username in deploy
-          server-password: ${{ secrets.MAVEN_CENTRAL_TOKEN }} # env variable for token in deploy
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
-          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }} # env variable for GPG private key passphrase
-      - name: Show settings.xml
-        run: |
-          cat /home/runner/.m2/settings.xml
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: secrets.GPG_PASSPHRASE
       - name: Set versions for release
         run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false
       - name: Publish to Apache Maven Central
         run: mvn deploy
         env:
-          MAVEN_USERNAME: MAVEN_USERNAME
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Grab release version
