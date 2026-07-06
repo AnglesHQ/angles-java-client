@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface AnglesReporterInterface {
 
+    void setApiKey(String apiKey);
+
     void startBuild(String name, String environmentName, String teamName, String componentName);
 
     void startBuild(String name, String environmentName, String teamName, String componentName, String phaseName);
