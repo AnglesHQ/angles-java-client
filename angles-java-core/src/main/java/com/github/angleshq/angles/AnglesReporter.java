@@ -76,6 +76,18 @@ public class AnglesReporter implements AnglesReporterInterface {
         screenshotRequests = new ScreenshotRequests(baseUrl);
     }
 
+    /**
+     * Configures the api key to be sent as the 'x-api-key' header on all requests.
+     * Generate a token via the Angles UI/API (POST /users/:userId/tokens) and pass the raw token string here.
+     */
+    public void setApiKey(String apiKey) {
+        buildRequests.setApiKey(apiKey);
+        executionRequests.setApiKey(apiKey);
+        environmentRequests.setApiKey(apiKey);
+        teamRequests.setApiKey(apiKey);
+        screenshotRequests.setApiKey(apiKey);
+    }
+
     public synchronized void startBuild(String name, String environmentName, String teamName, String componentName) {
         startBuild(name, environmentName, teamName, componentName, null);
     }

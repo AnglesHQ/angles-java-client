@@ -14,6 +14,10 @@ public class AnglesReporterEmpty implements AnglesReporterInterface {
         // do nothing
     }
 
+    public void setApiKey(String apiKey) {
+        // do nothing
+    }
+
     public void startBuild(String name, String environmentName, String teamName, String componentName) {
         // do nothing
     }

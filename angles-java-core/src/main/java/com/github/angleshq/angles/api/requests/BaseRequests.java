@@ -24,6 +24,7 @@ public abstract class BaseRequests {
     protected CloseableHttpClient client;
 
     protected String baseUrl;
+    protected String apiKey;
     protected Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
     protected BaseRequests(String baseUrl) {
@@ -38,12 +39,27 @@ public abstract class BaseRequests {
                 .build();
     }
 
+    /**
+     * Configures the api key to be sent as the 'x-api-key' header on all requests.
+     * Generate a token via the Angles UI/API (POST /users/:userId/tokens) and pass the raw token string here.
+     */
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    private void addAuthHeader(HttpRequestBase request) {
+        if (apiKey != null && !apiKey.isEmpty()) {
+            request.setHeader("x-api-key", apiKey);
+        }
+    }
+
     protected CloseableHttpResponse sendJSONPost(String path, Object message) throws IOException {
         HttpPost httpPost = new HttpPost(baseUrl.concat(path));
         StringEntity entity = new StringEntity(gson.toJson(message));
         httpPost.setEntity(entity);
         httpPost.setHeader("Accept", "application/json");
         httpPost.setHeader("Content-type", "application/json");
+        addAuthHeader(httpPost);
         return client.execute(httpPost);
     }
 
@@ -55,6 +71,7 @@ public abstract class BaseRequests {
         }
         httpPost.setHeader("Accept", "application/json");
         httpPost.setEntity(entity);
+        addAuthHeader(httpPost);
 
         return client.execute(httpPost);
     }
@@ -62,6 +79,7 @@ public abstract class BaseRequests {
     protected CloseableHttpResponse sendJSONGet(String path) throws IOException {
         HttpGet httpGet = new HttpGet(baseUrl.concat(path));
         httpGet.setHeader("Accept", "application/json");
+        addAuthHeader(httpGet);
         return client.execute(httpGet);
     }
 
@@ -74,6 +92,7 @@ public abstract class BaseRequests {
         }
         HttpGet httpGet = new HttpGet(builder.build());
         httpGet.setHeader("Accept", "application/json");
+        addAuthHeader(httpGet);
         return client.execute(httpGet);
     }
 
@@ -81,6 +100,7 @@ public abstract class BaseRequests {
     protected CloseableHttpResponse sendDelete(String path) throws IOException {
         HttpDelete httpDelete = new HttpDelete(baseUrl.concat(path));
         httpDelete.setHeader("Accept", "application/json");
+        addAuthHeader(httpDelete);
         return client.execute(httpDelete);
     }
 
@@ -90,6 +110,7 @@ public abstract class BaseRequests {
         httpPut.setEntity(entity);
         httpPut.setHeader("Accept", "application/json");
         httpPut.setHeader("Content-type", "application/json");
+        addAuthHeader(httpPut);
         return client.execute(httpPut);
     }
 
