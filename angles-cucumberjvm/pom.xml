@@ -9,6 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>angles-cucumberjvm</artifactId>
     <version>1.0.44-SNAPSHOT</version>
+    <name>Angles CucumberJVM</name>
     <properties>
         <cucumber.core.version>6.10.4</cucumber.core.version>
     </properties>

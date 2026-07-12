@@ -8,6 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>angles-testng</artifactId>
     <version>1.0.44-SNAPSHOT</version>
+    <name>Angles TestNG</name>
     <dependencies>
         <dependency>
             <groupId>com.github.angleshq</groupId>
