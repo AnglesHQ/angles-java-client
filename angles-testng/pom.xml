@@ -3,17 +3,17 @@
     <parent>
         <artifactId>angles-java-client</artifactId>
         <groupId>com.github.angleshq</groupId>
-        <version>1.0.44-SNAPSHOT</version>
+        <version>1.0.45-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>angles-testng</artifactId>
-    <version>1.0.44-SNAPSHOT</version>
+    <version>1.0.45-SNAPSHOT</version>
     <name>Angles TestNG</name>
     <dependencies>
         <dependency>
             <groupId>com.github.angleshq</groupId>
             <artifactId>angles-java-core</artifactId>
-            <version>1.0.44-SNAPSHOT</version>
+            <version>1.0.45-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
