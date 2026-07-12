@@ -9,6 +9,7 @@
     <groupId>com.github.angleshq</groupId>
     <artifactId>angles-java-core</artifactId>
     <version>1.0.44-SNAPSHOT</version>
+    <name>Angles Java Core</name>
 
     <dependencies>
         <dependency>

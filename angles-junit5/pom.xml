@@ -9,6 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>angles-junit5</artifactId>
     <version>1.0.44-SNAPSHOT</version>
+    <name>Angles JUnit5</name>
 
     <dependencies>
         <dependency>
