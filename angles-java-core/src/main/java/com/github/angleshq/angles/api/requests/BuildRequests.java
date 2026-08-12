@@ -5,6 +5,8 @@ import com.github.angleshq.angles.api.models.build.Artifact;
 import com.github.angleshq.angles.api.models.build.Build;
 import com.github.angleshq.angles.api.models.build.CreateBuild;
 import com.github.angleshq.angles.api.models.build.StoreArtifacts;
+import com.github.angleshq.angles.api.models.build.StoreExecutions;
+import com.github.angleshq.angles.api.models.execution.CreateExecution;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
@@ -69,6 +71,18 @@ public class BuildRequests extends BaseRequests {
         StoreArtifacts request = new StoreArtifacts();
         request.setArtifacts(artifacts);
         CloseableHttpResponse response = sendJSONPut(basePath + "/" + buildId + "/artifacts", request);
+        return processResponse(response, Build.class);
+    }
+
+    /**
+     * Stores all the given test executions against an existing build in a single call.
+     * Executions are grouped into suites by their suite name and the build metrics are
+     * recalculated by the Angles API.
+     */
+    public Build executions(String buildId, CreateExecution[] executions) throws IOException, AnglesServerException {
+        StoreExecutions request = new StoreExecutions();
+        request.setExecutions(executions);
+        CloseableHttpResponse response = sendJSONPut(basePath + "/" + buildId + "/executions", request);
         return processResponse(response, Build.class);
     }
 

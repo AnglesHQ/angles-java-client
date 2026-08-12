@@ -28,6 +28,10 @@ public interface AnglesReporterInterface {
 
     void saveTest();
 
+    void setBatchMode(boolean batchMode);
+
+    void saveAllTests();
+
     void storePlatformDetails(Platform... platform);
 
     void startAction(String description);

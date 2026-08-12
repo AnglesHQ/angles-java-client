@@ -27,6 +27,22 @@ Please ensure you set the following system variables (e.g. as part of the maven-
 </systemPropertyVariables>
 ```
 
+### Batch mode
+By default every call to `saveTest()` sends the test execution to the Angles API straight away. If you'd rather send the whole test run in a single request at the end (e.g. for large runs), you can enable batch mode on the reporter. The build is still created up-front and screenshots are still uploaded individually as the tests run (they need the build id), but the executions are gathered by the reporter until you call `saveAllTests()`.
+
+```java
+AnglesReporterInterface reporter = AnglesReporter.getInstance("http://127.0.0.1:3000/rest/api/v1.0/");
+reporter.setBatchMode(true);
+reporter.startBuild("TestRunName", "Environment", "Team", "Component");
+
+// run your tests as usual: startTest(), storeScreenshot(), pass()/fail() and saveTest()
+// saveTest() now stores the executions in the reporter rather than sending them.
+
+// once all tests are done, store all the executions against the build in one request.
+reporter.saveAllTests();
+```
+Note: the TestNG/JUnit5/Cucumber listeners currently report per test; when using batch mode with those, call `saveAllTests()` yourself once the run is finished.
+
 ### Log4j2 Appender 
 Add the appender to your log4j2 configuration file:
 ```
