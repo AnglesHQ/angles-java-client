@@ -3,7 +3,9 @@ package com.github.angleshq.angles.api.requests;
 import com.github.angleshq.angles.api.exceptions.AnglesServerException;
 import com.github.angleshq.angles.api.models.Platform;
 import com.github.angleshq.angles.api.models.screenshot.CreateScreenshot;
+import com.github.angleshq.angles.api.models.screenshot.FindImageOptions;
 import com.github.angleshq.angles.api.models.screenshot.ImageCompareResponse;
+import com.github.angleshq.angles.api.models.screenshot.ImageFindResponse;
 import com.github.angleshq.angles.api.models.screenshot.Screenshot;
 import com.github.angleshq.angles.api.models.screenshot.UpdateScreenshot;
 import com.google.gson.JsonArray;
@@ -12,6 +14,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.tika.Tika;
 
 import java.io.File;
@@ -98,5 +101,55 @@ public class ScreenshotRequests extends BaseRequests {
     public Screenshot update(String screenshotId, UpdateScreenshot updateRequest) throws IOException, AnglesServerException {
         CloseableHttpResponse response = sendJSONPut(basePath + "/" + screenshotId, updateRequest);
         return processResponse(response, Screenshot.class);
+    }
+
+    private Map<String, Object> findImageParameters(FindImageOptions options) {
+        Map<String, Object> parameters = new HashMap<>();
+        if (options == null) {
+            return parameters;
+        }
+        if (options.getMinConfidence() != null) { parameters.put("minConfidence", options.getMinConfidence()); }
+        if (options.getScaleMin() != null) { parameters.put("scaleMin", options.getScaleMin()); }
+        if (options.getScaleMax() != null) { parameters.put("scaleMax", options.getScaleMax()); }
+        if (options.getMaxMatches() != null) { parameters.put("maxMatches", options.getMaxMatches()); }
+        if (options.getGrayscale() != null) { parameters.put("grayscale", options.getGrayscale()); }
+        return parameters;
+    }
+
+    /**
+     * Finds a stored screenshot (the template) within another stored screenshot using
+     * multi-scale template matching, and returns the matched region(s).
+     */
+    public ImageFindResponse findImageInScreenshot(String screenshotId, String templateScreenshotId, FindImageOptions options) throws IOException, URISyntaxException, AnglesServerException {
+        CloseableHttpResponse response = sendJSONGet(basePath + "/" + screenshotId + "/find/" + templateScreenshotId, findImageParameters(options));
+        return processResponse(response, ImageFindResponse.class);
+    }
+
+    /**
+     * Finds a local template image file within a stored screenshot using multi-scale
+     * template matching. The template is uploaded with the request and not stored.
+     */
+    public ImageFindResponse findImageInScreenshot(String screenshotId, File templateFile, FindImageOptions options) throws IOException, URISyntaxException, AnglesServerException {
+        String mimeType = tika.detect(templateFile);
+        HttpEntity entity = MultipartEntityBuilder
+            .create()
+            .setContentType(ContentType.MULTIPART_FORM_DATA)
+            .addBinaryBody("template", templateFile, ContentType.getByMimeType(mimeType), templateFile.getName())
+            .build();
+        CloseableHttpResponse response = sendMultiPartEntity(basePath + "/" + screenshotId + "/find", new HashMap<>(), findImageParameters(options), entity);
+        return processResponse(response, ImageFindResponse.class);
+    }
+
+    /**
+     * Same search as findImageInScreenshot, but returns the screenshot image (PNG bytes)
+     * with the matched region(s) outlined.
+     */
+    public byte[] findImageInScreenshotImage(String screenshotId, String templateScreenshotId, FindImageOptions options) throws IOException, URISyntaxException, AnglesServerException {
+        CloseableHttpResponse response = sendJSONGet(basePath + "/" + screenshotId + "/find/" + templateScreenshotId + "/image", findImageParameters(options));
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            return EntityUtils.toByteArray(response.getEntity());
+        }
+        processErrorResponse(response);
+        return null;
     }
 }

@@ -76,6 +76,24 @@ public abstract class BaseRequests {
         return client.execute(httpPost);
     }
 
+    protected CloseableHttpResponse sendMultiPartEntity(String path, Map<String, String> headers, Map<String, Object> parameters, HttpEntity entity) throws IOException, URISyntaxException {
+        URIBuilder builder = new URIBuilder(baseUrl.concat(path));
+        if (parameters != null && parameters.size() > 0) {
+            for (String key: parameters.keySet()) {
+                builder.setParameter(key, parameters.get(key).toString());
+            }
+        }
+        HttpPost httpPost = new HttpPost(builder.build());
+        for (String key: headers.keySet()) {
+            httpPost.setHeader(key, headers.get(key));
+        }
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(entity);
+        addAuthHeader(httpPost);
+
+        return client.execute(httpPost);
+    }
+
     protected CloseableHttpResponse sendJSONGet(String path) throws IOException {
         HttpGet httpGet = new HttpGet(baseUrl.concat(path));
         httpGet.setHeader("Accept", "application/json");
