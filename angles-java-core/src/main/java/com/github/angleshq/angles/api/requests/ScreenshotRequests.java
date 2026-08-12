@@ -2,6 +2,7 @@ package com.github.angleshq.angles.api.requests;
 
 import com.github.angleshq.angles.api.exceptions.AnglesServerException;
 import com.github.angleshq.angles.api.models.Platform;
+import com.github.angleshq.angles.api.models.screenshot.CompareOptions;
 import com.github.angleshq.angles.api.models.screenshot.CreateScreenshot;
 import com.github.angleshq.angles.api.models.screenshot.FindImageOptions;
 import com.github.angleshq.angles.api.models.screenshot.ImageCompareResponse;
@@ -85,6 +86,34 @@ public class ScreenshotRequests extends BaseRequests {
 
     public ImageCompareResponse baselineCompare(String screenshotId) throws IOException, AnglesServerException {
         CloseableHttpResponse response = sendJSONGet(basePath + "/" + screenshotId + "/baseline/compare");
+        return processResponse(response, ImageCompareResponse.class);
+    }
+
+    private Map<String, Object> compareParameters(CompareOptions options) {
+        Map<String, Object> parameters = new HashMap<>();
+        if (options == null) {
+            return parameters;
+        }
+        if (options.getAlgorithm() != null) { parameters.put("algorithm", options.getAlgorithm()); }
+        if (options.getThreshold() != null) { parameters.put("threshold", options.getThreshold()); }
+        if (options.getRegions() != null) { parameters.put("regions", options.getRegions()); }
+        return parameters;
+    }
+
+    /**
+     * Compares the screenshot against its baseline with explicit compare options
+     * (algorithm 'pixel'|'ssim'|'phash', threshold, regions).
+     */
+    public ImageCompareResponse baselineCompare(String screenshotId, CompareOptions options) throws IOException, URISyntaxException, AnglesServerException {
+        CloseableHttpResponse response = sendJSONGet(basePath + "/" + screenshotId + "/baseline/compare", compareParameters(options));
+        return processResponse(response, ImageCompareResponse.class);
+    }
+
+    /**
+     * Compares two stored screenshots and returns the comparison statistics.
+     */
+    public ImageCompareResponse compare(String screenshotId, String screenshotCompareId, CompareOptions options) throws IOException, URISyntaxException, AnglesServerException {
+        CloseableHttpResponse response = sendJSONGet(basePath + "/" + screenshotId + "/compare/" + screenshotCompareId, compareParameters(options));
         return processResponse(response, ImageCompareResponse.class);
     }
 
