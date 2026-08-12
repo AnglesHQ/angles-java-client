@@ -50,6 +50,14 @@ public class AnglesReporterEmpty implements AnglesReporterInterface {
         // do nothing.
     }
 
+    public void setBatchMode(boolean batchMode) {
+        // do nothing.
+    }
+
+    public void saveAllTests() {
+        // do nothing.
+    }
+
     public void storePlatformDetails(Platform... platform) {
         // do nothing
     }

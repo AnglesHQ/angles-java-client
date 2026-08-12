@@ -16,6 +16,9 @@ import com.github.angleshq.angles.api.requests.*;
 import org.apache.http.client.config.RequestConfig;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +46,9 @@ public class AnglesReporter implements AnglesReporterInterface {
     private InheritableThreadLocal<CreateExecution> currentExecution = new InheritableThreadLocal<>();
     private InheritableThreadLocal<Action> currentAction = new InheritableThreadLocal<>();
     private ThreadLocal<Action> setUpAction = new InheritableThreadLocal<>();
+
+    private volatile boolean batchMode = false;
+    private final List<CreateExecution> batchedExecutions = Collections.synchronizedList(new ArrayList<>());
 
     public static AnglesReporterInterface getInstance(String url) {
        return getInstance(url, null);
@@ -152,11 +158,48 @@ public class AnglesReporter implements AnglesReporterInterface {
     public void saveTest() {
         try {
             if (currentExecution.get() != null) {
-                executionRequests.create(currentExecution.get());
+                if (batchMode) {
+                    batchedExecutions.add(currentExecution.get());
+                } else {
+                    executionRequests.create(currentExecution.get());
+                }
                 currentExecution.set(null);
             }
         }  catch (IOException | AnglesServerException exception) {
             throw new Error("Unable to save/update test execution due to [" + exception.getMessage() + "]");
+        }
+    }
+
+    /**
+     * When batch mode is enabled, saveTest() no longer sends each test execution to the Angles
+     * API individually, but stores them in the reporter instead. Once all tests are done, call
+     * saveAllTests() to store all the executions against the current build in a single request.
+     * Screenshots are always uploaded individually (they need the build id), so they can still
+     * be stored as the tests run.
+     */
+    public void setBatchMode(boolean batchMode) {
+        this.batchMode = batchMode;
+    }
+
+    /**
+     * Stores all the test executions gathered by saveTest() whilst in batch mode against the
+     * current build in a single request. Call this once at the end of the test run.
+     */
+    public synchronized void saveAllTests() {
+        if (batchedExecutions.isEmpty()) {
+            return;
+        }
+        CreateExecution[] executions;
+        synchronized (batchedExecutions) {
+            executions = batchedExecutions.toArray(new CreateExecution[0]);
+        }
+        try {
+            currentBuild.set(buildRequests.executions(currentBuild.get().getId(), executions));
+            // only remove what was sent, so executions saved whilst the request was in
+            // flight are picked up by the next call.
+            batchedExecutions.removeAll(Arrays.asList(executions));
+        } catch (IOException | AnglesServerException exception) {
+            throw new Error("Unable to save test executions due to [" + exception.getMessage() + "]");
         }
     }
 
