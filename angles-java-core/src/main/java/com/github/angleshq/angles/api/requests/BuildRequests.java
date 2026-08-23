@@ -1,6 +1,7 @@
 package com.github.angleshq.angles.api.requests;
 
 import com.github.angleshq.angles.api.exceptions.AnglesServerException;
+import com.github.angleshq.angles.api.models.ExecutionType;
 import com.github.angleshq.angles.api.models.build.Artifact;
 import com.github.angleshq.angles.api.models.build.Build;
 import com.github.angleshq.angles.api.models.build.CreateBuild;
@@ -28,10 +29,19 @@ public class BuildRequests extends BaseRequests {
     }
 
     public Build[] get(String teamId, Integer limit, Integer skip) throws IOException, URISyntaxException, AnglesServerException {
+        return get(teamId, limit, skip, null);
+    }
+
+    /**
+     * Retrieves builds for a team, optionally narrowed to either automated or manual ones.
+     * A null executionType returns both, which is the unfiltered behaviour.
+     */
+    public Build[] get(String teamId, Integer limit, Integer skip, ExecutionType executionType) throws IOException, URISyntaxException, AnglesServerException {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("teamId", teamId);
         if (limit != null) { parameters.put("limit", limit); }
         if (skip != null) { parameters.put("skip", skip); }
+        if (executionType != null) { parameters.put("executionType", executionType.getValue()); }
         CloseableHttpResponse response = sendJSONGet(basePath, parameters);
         return processResponse(response, Build[].class);
     }
