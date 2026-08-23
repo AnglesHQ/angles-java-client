@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Setter @Getter @NoArgsConstructor
 public class Step {
@@ -17,6 +19,8 @@ public class Step {
     private StepStatus status;
     private Date timestamp;
     private String screenshot;
+    /* Attachment ids referenced by a manual step result, alongside the screenshot. */
+    private List<String> attachments = new ArrayList<>();
 
     public Step(String name, String info, StepStatus status, Date timestamp) {
         this.name = name;

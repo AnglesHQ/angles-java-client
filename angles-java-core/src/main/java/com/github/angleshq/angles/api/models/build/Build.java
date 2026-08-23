@@ -2,6 +2,7 @@ package com.github.angleshq.angles.api.models.build;
 
 import com.github.angleshq.angles.api.models.BaseModel;
 import com.github.angleshq.angles.api.models.Environment;
+import com.github.angleshq.angles.api.models.ExecutionType;
 import com.github.angleshq.angles.api.models.Phase;
 import com.github.angleshq.angles.api.models.Team;
 import lombok.Getter;
@@ -21,6 +22,8 @@ public class Build extends BaseModel {
     private String component;
     private Phase phase;
     private Map<String, Integer> result;
+    /* Server-assigned; automated unless this build was created by a manual test run. */
+    private ExecutionType executionType;
     private List<Artifact> artifacts = new ArrayList<>();
     private List<Suite> suites = new ArrayList<>();
 

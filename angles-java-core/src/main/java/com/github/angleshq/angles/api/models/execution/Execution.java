@@ -1,6 +1,7 @@
 package com.github.angleshq.angles.api.models.execution;
 
 import com.github.angleshq.angles.api.models.BaseModel;
+import com.github.angleshq.angles.api.models.ExecutionType;
 import com.github.angleshq.angles.api.models.Platform;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,15 @@ public class Execution extends BaseModel {
     private Date start;
     private List<Action> actions = new ArrayList<>();
     private List<Platform> platforms = new ArrayList<>();
+
+    /* Server-assigned; automated unless this execution came from a manual test run. */
+    private ExecutionType executionType;
+
+    /* Populated only on manual executions - all read-only from this client. */
+    private String manualTestCase;
+    private String manualTestCaseVersion;
+    private Integer versionNumber;
+    private String executedBy;
 
     public Execution(String build, String title, String suite, String feature,Date start) {
         this.build = build;
