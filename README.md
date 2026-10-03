@@ -27,6 +27,26 @@ Please ensure you set the following system variables (e.g. as part of the maven-
 </systemPropertyVariables>
 ```
 
+### Attachments
+A test can attach files to its results: console logs, network HAR files, videos, Playwright traces, page HTML snapshots and images. Angles shows each one on the test (or the step) with a viewer that suits it. The file extension decides how it is shown, so keep the real one: `.log`/`.txt`, `.json`, `.har`, `.webm`/`.mp4`, `.zip` (shown as a Playwright trace when the name contains "trace"), `.html`/`.htm`, `.png`/`.jpg`/`.jpeg`/`.gif`/`.webp`. Requires an Angles server with test attachment support.
+
+```java
+reporter.fail("Order confirmation", "Order confirmed", "Payment declined", "");
+
+// attach to the step you just reported, e.g. the page as it was when the assertion failed
+reporter.attachDataToLastStep(driver.getPageSource().getBytes(StandardCharsets.UTF_8), "page.html");
+reporter.attachFileToLastStep(screenshotFile);
+
+// attach to the whole test
+reporter.attachFile(new File("target/videos/checkout.webm"));
+reporter.attachFile(new File("target/network.har"));
+reporter.attachData(consoleLog.getBytes(StandardCharsets.UTF_8), "console.log");
+
+reporter.saveTest();
+```
+
+Uploads happen straight away (they only need the build id), so this works in batch mode too. Like `storeScreenshot`, a failed upload throws an `Error`.
+
 ### Batch mode
 By default every call to `saveTest()` sends the test execution to the Angles API straight away. If you'd rather send the whole test run in a single request at the end (e.g. for large runs), you can enable batch mode on the reporter. The build is still created up-front and screenshots are still uploaded individually as the tests run (they need the build id), but the executions are gathered by the reporter until you call `saveAllTests()`.
 

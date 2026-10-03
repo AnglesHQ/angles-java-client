@@ -133,19 +133,26 @@ public abstract class BaseRequests {
     }
 
     protected String getDefaultErrorMessage(CloseableHttpResponse response) {
-        String errorMessage = "";
+        // The body can only be read once, so it is read here and parsed from the string.
+        String bodyString;
         try {
-            String bodyString =  EntityUtils.toString(response.getEntity());
-            JsonObject jsonResponse = gson.fromJson(bodyString, JsonObject.class);
-            errorMessage = jsonResponse.get("message").toString();
-        } catch (IOException | JsonSyntaxException exc) {
-            try {
-                errorMessage =  EntityUtils.toString(response.getEntity());
-            } catch (Exception exception) {
-                errorMessage = "Unable to extract error message from response due to [" + exception.getMessage() + "]";
-            }
+            bodyString = EntityUtils.toString(response.getEntity());
+        } catch (Exception exception) {
+            return "Unable to extract error message from response due to [" + exception.getMessage() + "]";
         }
-        return errorMessage;
+        try {
+            JsonObject jsonResponse = gson.fromJson(bodyString, JsonObject.class);
+            // Most endpoints answer {"message": ...}; upload rejections answer {"error": ...}.
+            if (jsonResponse != null && jsonResponse.has("message")) {
+                return jsonResponse.get("message").toString();
+            }
+            if (jsonResponse != null && jsonResponse.has("error")) {
+                return jsonResponse.get("error").toString();
+            }
+        } catch (JsonSyntaxException | IllegalStateException exception) {
+            // not JSON (or not an object): fall back to the raw body below
+        }
+        return bodyString;
     }
 
     protected <T> T processResponse(CloseableHttpResponse response, Class<T> responseClass) throws IOException, AnglesServerException {

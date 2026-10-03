@@ -2,6 +2,7 @@ package com.github.angleshq.angles;
 
 import com.github.angleshq.angles.api.exceptions.AnglesServerException;
 import com.github.angleshq.angles.api.models.Platform;
+import com.github.angleshq.angles.api.models.attachment.TestAttachment;
 import com.github.angleshq.angles.api.models.build.Artifact;
 import com.github.angleshq.angles.api.models.build.Build;
 import com.github.angleshq.angles.api.models.build.CreateBuild;
@@ -15,6 +16,7 @@ import com.github.angleshq.angles.api.models.screenshot.ScreenshotDetails;
 import com.github.angleshq.angles.api.requests.*;
 import org.apache.http.client.config.RequestConfig;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +40,7 @@ public class AnglesReporter implements AnglesReporterInterface {
     private EnvironmentRequests environmentRequests;
     private TeamRequests teamRequests;
     private ScreenshotRequests screenshotRequests;
+    private AttachmentRequests attachmentRequests;
 
     protected static int connectionTimeout = 5000;
     protected static int socketTimeout = 10000;
@@ -80,6 +83,7 @@ public class AnglesReporter implements AnglesReporterInterface {
         environmentRequests = new EnvironmentRequests(baseUrl);
         teamRequests = new TeamRequests(baseUrl);
         screenshotRequests = new ScreenshotRequests(baseUrl);
+        attachmentRequests = new AttachmentRequests(baseUrl);
     }
 
     /**
@@ -92,6 +96,7 @@ public class AnglesReporter implements AnglesReporterInterface {
         environmentRequests.setApiKey(apiKey);
         teamRequests.setApiKey(apiKey);
         screenshotRequests.setApiKey(apiKey);
+        attachmentRequests.setApiKey(apiKey);
     }
 
     public synchronized void startBuild(String name, String environmentName, String teamName, String componentName) {
@@ -315,6 +320,79 @@ public class AnglesReporter implements AnglesReporterInterface {
             }
         }
         return null;
+    }
+
+    public TestAttachment attachFile(File file) {
+        return attachFile(file, null);
+    }
+
+    public TestAttachment attachFile(File file, String fileName) {
+        CreateExecution execution = requireExecution("attachFile");
+        TestAttachment attachment = upload("attachFile", () -> attachmentRequests.upload(currentBuild.get().getId(), file, fileName));
+        execution.addAttachment(attachment.getId());
+        return attachment;
+    }
+
+    public TestAttachment attachData(byte[] data, String fileName) {
+        CreateExecution execution = requireExecution("attachData");
+        TestAttachment attachment = upload("attachData", () -> attachmentRequests.upload(currentBuild.get().getId(), data, fileName));
+        execution.addAttachment(attachment.getId());
+        return attachment;
+    }
+
+    public TestAttachment attachFileToLastStep(File file) {
+        return attachFileToLastStep(file, null);
+    }
+
+    public TestAttachment attachFileToLastStep(File file, String fileName) {
+        Step step = requireLastStep("attachFileToLastStep");
+        TestAttachment attachment = upload("attachFileToLastStep", () -> attachmentRequests.upload(currentBuild.get().getId(), file, fileName));
+        step.addAttachment(attachment.getId());
+        return attachment;
+    }
+
+    public TestAttachment attachDataToLastStep(byte[] data, String fileName) {
+        Step step = requireLastStep("attachDataToLastStep");
+        TestAttachment attachment = upload("attachDataToLastStep", () -> attachmentRequests.upload(currentBuild.get().getId(), data, fileName));
+        step.addAttachment(attachment.getId());
+        return attachment;
+    }
+
+    private interface Upload {
+        TestAttachment run() throws IOException, AnglesServerException;
+    }
+
+    // Errors are raised the same way storeScreenshot raises them.
+    private TestAttachment upload(String method, Upload upload) {
+        try {
+            TestAttachment attachment = upload.run();
+            if (attachment == null || attachment.getId() == null) {
+                throw new Error(method + ": Angles did not return the stored attachment.");
+            }
+            return attachment;
+        } catch (IOException | AnglesServerException exception) {
+            throw new Error("Unable to store attachment due to [" + exception.getMessage() + "]");
+        }
+    }
+
+    private CreateExecution requireExecution(String method) {
+        if (currentBuild.get() == null || currentBuild.get().getId() == null) {
+            throw new Error(method + ": start a build before attaching files.");
+        }
+        if (currentExecution.get() == null) {
+            throw new Error(method + ": start a test before attaching files.");
+        }
+        return currentExecution.get();
+    }
+
+    private Step requireLastStep(String method) {
+        requireExecution(method);
+        Action action = currentAction.get();
+        List<Step> steps = action != null ? action.getSteps() : null;
+        if (steps == null || steps.isEmpty()) {
+            throw new Error(method + ": add a step (pass, fail, info, ...) before attaching a file to it.");
+        }
+        return steps.get(steps.size() - 1);
     }
 
     public String getBuildId() {

@@ -20,6 +20,8 @@ public class Execution extends BaseModel {
     private Date start;
     private List<Action> actions = new ArrayList<>();
     private List<Platform> platforms = new ArrayList<>();
+    /* Ids of the files attached to the whole test. Step-level ones are on the steps. */
+    private List<String> attachments = new ArrayList<>();
 
     public Execution(String build, String title, String suite, String feature,Date start) {
         this.build = build;
