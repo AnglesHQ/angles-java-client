@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Setter @Getter @NoArgsConstructor
 public class Step {
@@ -17,6 +19,15 @@ public class Step {
     private StepStatus status;
     private Date timestamp;
     private String screenshot;
+    /** Ids of files attached to this step (see AnglesReporter.attachFileToLastStep). */
+    private List<String> attachments;
+
+    public void addAttachment(String attachmentId) {
+        if (attachments == null) {
+            attachments = new ArrayList<>();
+        }
+        attachments.add(attachmentId);
+    }
 
     public Step(String name, String info, StepStatus status, Date timestamp) {
         this.name = name;

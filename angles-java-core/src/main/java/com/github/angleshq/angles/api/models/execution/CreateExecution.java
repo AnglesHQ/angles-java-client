@@ -24,9 +24,15 @@ public class CreateExecution implements Serializable {
     /* prevent any modifications by other threads to cause an issue. */
     private List<Action> actions = new CopyOnWriteArrayList<>();
     private List<Platform> platforms = new ArrayList<>();
+    /* Ids of files attached to the whole test, e.g. a video, trace, HAR file or console log. */
+    private List<String> attachments = new CopyOnWriteArrayList<>();
 
     public void addTag(String tag) {
         this.tags.add(tag);
+    }
+
+    public void addAttachment(String attachmentId) {
+        this.attachments.add(attachmentId);
     }
 
     public void addAction(Action action) {

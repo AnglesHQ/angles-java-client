@@ -1,11 +1,13 @@
 package com.github.angleshq.angles;
 
 import com.github.angleshq.angles.api.models.Platform;
+import com.github.angleshq.angles.api.models.attachment.TestAttachment;
 import com.github.angleshq.angles.api.models.build.Artifact;
 import com.github.angleshq.angles.api.models.screenshot.ImageCompareResponse;
 import com.github.angleshq.angles.api.models.screenshot.Screenshot;
 import com.github.angleshq.angles.api.models.screenshot.ScreenshotDetails;
 
+import java.io.File;
 import java.util.List;
 
 public class AnglesReporterEmpty implements AnglesReporterInterface {
@@ -121,6 +123,36 @@ public class AnglesReporterEmpty implements AnglesReporterInterface {
     }
 
     public String getBuildId() {
+        // do nothing
+        return null;
+    }
+
+    public TestAttachment attachFile(File file) {
+        // do nothing
+        return null;
+    }
+
+    public TestAttachment attachFile(File file, String fileName) {
+        // do nothing
+        return null;
+    }
+
+    public TestAttachment attachData(byte[] data, String fileName) {
+        // do nothing
+        return null;
+    }
+
+    public TestAttachment attachFileToLastStep(File file) {
+        // do nothing
+        return null;
+    }
+
+    public TestAttachment attachFileToLastStep(File file, String fileName) {
+        // do nothing
+        return null;
+    }
+
+    public TestAttachment attachDataToLastStep(byte[] data, String fileName) {
         // do nothing
         return null;
     }
