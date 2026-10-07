@@ -32,6 +32,7 @@ public class AnglesReporter implements AnglesReporterInterface {
 
     public static final String DEFAULT_ACTION_NAME = "Test Details";
     public static final String EMPTY_REPORTER_NAME = "empty";
+    public static final String API_KEY_PROPERTY = "angles.apiKey";
     private static Map<String, AnglesReporterInterface> reporterMap = new HashMap<>();
     private static boolean enabled = true;
     private String baseUrl;
@@ -84,6 +85,10 @@ public class AnglesReporter implements AnglesReporterInterface {
         teamRequests = new TeamRequests(baseUrl);
         screenshotRequests = new ScreenshotRequests(baseUrl);
         attachmentRequests = new AttachmentRequests(baseUrl);
+        String apiKey = System.getProperty(API_KEY_PROPERTY);
+        if (!isBlank(apiKey)) {
+            setApiKey(apiKey);
+        }
     }
 
     /**
